@@ -1,0 +1,12 @@
+transformers
+datasets
+sentencepiece
+pyserial
+more_itertools
+scipy
+scikit-learn==0.24.2
+openai
+sacred
+python-dotenv
+cachetools
+sentence-transformers
