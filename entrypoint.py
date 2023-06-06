@@ -118,7 +118,8 @@ def main(classifier_name,
     # args = parser.parse_args()
     # import ast
     # classifier_kwargs = ast.literal_eval(args.classifier_kwargs)
-    classifier_kwargs["config"] = task
+    if classifier_kwargs is not None and classifier_kwargs != "":
+        classifier_kwargs["config"] = task
     predictor = Raft(classifier_name, task, classifier_kwargs)
     if debug:
         test_examples = predictor.test_dataset[0]
