@@ -7,7 +7,7 @@ import torch
 from typing import List
 import transformers
 from datasets import Dataset
-
+import time
 from subprocess import SubprocessError
 import datasets
 from raft_baselines import classifiers
@@ -81,18 +81,25 @@ class Raft():
     def __init__(self, classifier_name: str, task: str, classifier_kwargs: str = None):
         raft_dataset = datasets.load_dataset("ought/raft", name=task)
         train_dataset = raft_dataset["train"]
-        classifier_cls = getattr(classifiers, classifier_name)
+        if classifier_name != "test":
+            classifier_cls = getattr(classifiers, classifier_name)
+            self.classifier = classifier_cls(train_dataset, **classifier_kwargs)
+        self.classifier_name = classifier_name
         if not classifier_kwargs:
             classifier_kwargs = {}
-        self.classifier = classifier_cls(train_dataset, **classifier_kwargs)
         self.test_dataset = raft_dataset["test"]
 
     def predict(self, inputs: List[str]):
-        for one_input in inputs:
-            output_probs = self.classifier.classify(one_input)
-            output, _ = max(output_probs.items(), key=lambda kv_pair: kv_pair[1])
-            # print(output_probs)
-            yield output
+        if self.classifier_name == "test":
+            for one_input in inputs:
+                time.sleep(0.01)
+                yield "1"
+        else:
+            for one_input in inputs:
+                output_probs = self.classifier.classify(one_input)
+                output, _ = max(output_probs.items(), key=lambda kv_pair: kv_pair[1])
+                # print(output_probs)
+                yield output
 
     def predict_offline(self, inputs: List[str]):
         return self.predict(inputs)
